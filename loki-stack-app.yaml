@@ -64,7 +64,8 @@ spec:
 
         grafana:
           enabled: true
-          replicaCount: 2
+          deployment:
+            replicas: 2
           image:
             tag: latest
           adminPassword: newadmin123
