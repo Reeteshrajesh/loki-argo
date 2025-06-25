@@ -141,7 +141,9 @@ You should see:
 
 ## 📸 Screenshot (Loki Stack in Argo CD)
 
-![Loki Stack Argo CD Screenshot](./assets/loki-argocd.png)
+![Loki Stack Argo CD Screenshot(applications)](./assets/loki-argocd1.png)
+![Loki Stack Argo CD Screenshot(loki-stack)](./assets/loki-argocd.png)
+![Loki Stack Argo CD Screenshot(nginx)](./assets/loki-argocd2.png)
 
 ---
 
