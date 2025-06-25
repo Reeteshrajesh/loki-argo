@@ -7,22 +7,89 @@ spec:
   project: default
 
   source:
-    repoURL: 'https://github.com/Reeteshrajesh/loki-argo.git'
+    repoURL: https://github.com/Reeteshrajesh/loki-argo.git
     targetRevision: HEAD
-    path: charts/loki-stack         # root of the repo
+    path: charts/loki-stack       # 👈 assuming you have the chart here
     helm:
       releaseName: loki-stack
-      valueFiles:
-        - ../values.yaml
+      values: |
+        loki:
+          enabled: true
+          isDefault: true
+          persistence:
+            enabled: true
+            accessModes: ["ReadWriteOnce"]
+            size: 10Gi
+            storageClassName: standard
+            mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 45
+          config:
+            schema_config:
+              configs:
+                - from: 2021-01-01
+                  store: boltdb-shipper
+                  object_store: filesystem
+                  schema: v12
+                  index:
+                    prefix: index_
+                    period: 24h
+            storage_config:
+              boltdb_shipper:
+                active_index_directory: /data/index
+                cache_location: /data/cache
+                shared_store: filesystem
+              filesystem:
+                directory: /data/chunks
+          compactor:
+            working_directory: /data/compactor
+            shared_store: filesystem
+
+        promtail:
+          enabled: true
+          config:
+            logLevel: info
+            serverPort: 3101
+            clients:
+              - url: http://loki-stack:3100/loki/api/v1/push
+                tenant_id: "my-tenant"
+
+        grafana:
+          enabled: true
+          image:
+            tag: latest
+          adminPassword: admin
+          sidecar:
+            datasources:
+              enabled: true
+              maxLines: 1000
+              enableLogVolume: true
+
+        prometheus:
+          enabled: true
+          persistence:
+            enabled: true
+            storageClassName: standard
+            accessModes: ["ReadWriteOnce"]
+            size: 50Gi
+            mountPath: /prometheus
 
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
     namespace: observability
 
   syncPolicy:
     automated:
-      selfHeal: true
       prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
 
