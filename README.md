@@ -8,7 +8,7 @@ This repo demonstrates a complete GitOps setup to deploy the **Loki logging stac
 ---
 
 ## 🗂️ Repo Structure
-
+```
 loki-argo/
 ├── charts/loki-stack/          # Vendored Helm chart
 ├── values.yaml                 # Custom values for Loki stack
@@ -16,7 +16,7 @@ loki-argo/
 ├── nginx/                      # Sample additional app (NGINX)
 │     └── deployment.yaml
 ├── nginx-app.yaml              # Argo CD Application for NGINX
-
+```
 
 ---
 
