@@ -9,11 +9,11 @@ spec:
   source:
     repoURL: 'https://github.com/Reeteshrajesh/loki-argo.git'
     targetRevision: HEAD
-    path: loki-stack/charts/loki-stack         # root of the repo
+    path: charts/loki-stack         # root of the repo
     helm:
       releaseName: loki-stack
       valueFiles:
-        - ../../values.yaml
+        - ../values.yaml
 
   destination:
     server: 'https://kubernetes.default.svc'
