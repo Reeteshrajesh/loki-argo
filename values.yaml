@@ -1,0 +1,71 @@
+loki:
+  enabled: true
+  isDefault: true
+  persistence:
+    enabled: true
+    accessModes: ["ReadWriteOnce"]
+    size: 5Gi
+    storageClassName: standard
+    mountPath: /data
+  config:
+    schema_config:
+      configs:
+        - from: 2024-01-01
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v12
+          index:
+            prefix: index_
+            period: 24h
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /data/index
+        cache_location: /data/cache
+        shared_store: filesystem
+      filesystem:
+        directory: /data/chunks
+  compactor:
+    working_directory: /data/compactor
+    shared_store: filesystem
+
+promtail:
+  enabled: true
+  config:
+    logLevel: info
+    serverPort: 3101
+    clients:
+      - url: http://loki-stack:3100/loki/api/v1/push
+    scrape_configs:
+      - job_name: system
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: varlogs
+              __path__: /var/log/*.log
+
+grafana:
+  enabled: true
+  adminPassword: admin
+  image:
+    tag: latest
+  sidecar:
+    datasources:
+      enabled: true
+
+prometheus:
+  enabled: true
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+  kubeStateMetrics:
+    enabled: false
+  nodeExporter:
+    enabled: false
+  persistence:
+    enabled: true
+    storageClassName: standard
+    accessModes: ["ReadWriteOnce"]
+    size: 5Gi
+
